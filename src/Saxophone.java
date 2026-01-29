@@ -1,6 +1,6 @@
 public class Saxophone extends Vent {
 
-    private String type;
+    @CsvCol(index = 6) private String type;
 
     public Saxophone(int id, String nom, String marque, double prix, String materiau, String type) {
         super(id, nom, marque, prix, materiau);

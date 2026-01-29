@@ -1,8 +1,8 @@
 public abstract class Instrument {
-    protected int id;
-    protected String nom;
-    protected String marque;
-    protected double prix;
+    @CsvCol(index = 1) protected int id;
+    @CsvCol(index = 2) protected String nom;
+    @CsvCol(index = 3) protected String marque;
+    @CsvCol(index = 4) protected double prix;
 
     public Instrument(int id, String nom, String marque, double prix) {
         this.id = id;

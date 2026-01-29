@@ -1,5 +1,5 @@
 public abstract class Vent extends Instrument {
-    protected String materiau;
+    @CsvCol(index = 5) protected String materiau;
 
     public Vent(int id, String nom, String marque, double prix, String materiau) {
         super(id, nom, marque, prix);

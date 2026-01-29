@@ -1,66 +1,59 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.lang.reflect.Field;
 
-public class GestionnaireCSV {
-    private String cheminFichier;
+public class GestionnaireCSV{
 
-    public GestionnaireCSV(String cheminFichier) {
-        this.cheminFichier = cheminFichier;
-    }
+    public <T> List<T> chargerDonnees(String cheminFichier, Class<T> classeCible) throws Exception {
+        List<T> resultat = new ArrayList<>();
+        BufferedReader lecteur = new BufferedReader(new FileReader(cheminFichier));
+        String ligne;
 
-    public List<Instrument> chargerInstruments() {
-        List<Instrument> liste = new ArrayList<>();
+        while ((ligne = lecteur.readLine()) != null) {
+            String[] colonnes = ligne.split(";");
+            T objet = classeCible.getDeclaredConstructor().newInstance();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(cheminFichier))) {
-            String ligne;
-            while ((ligne = br.readLine()) != null) {
-                String[] d = ligne.split(";");
-                String typeClasse = d[0];
+            // ON REMONTE LA GÉNÉALOGIE (C'est l'astuce pour Corde + Instrument)
+            Class<?> classeActuelle = classeCible;
+            while (classeActuelle != null) {
 
-                Instrument ins = creerInstance(typeClasse, d);
-                if (ins != null) liste.add(ins);
+                for (Field champ : classeActuelle.getDeclaredFields()) {
+                    if (champ.isAnnotationPresent(CsvCol.class)) {
+                        CsvCol etiquette = champ.getAnnotation(CsvCol.class);
+                        int index = etiquette.index() - 1; //
+
+                        if (index < colonnes.length) {
+                            champ.setAccessible(true);
+                            Object valeur = convertir(colonnes[index], champ.getType());
+                            champ.set(objet, valeur);
+                        }
+                    }
+                }
+                // On passe au parent (ex: de Corde à Instrument)
+                classeActuelle = classeActuelle.getSuperclass();
             }
-        } catch (IOException e) {
-            System.out.println("Erreur de lecture : " + e.getMessage());
+            resultat.add(objet);
         }
-        return liste;
+        lecteur.close();
+
+        // TRI PERSISTANT PAR ID (Index 1)
+        resultat.sort(Comparator.comparingInt(this::extraireId));
+
+        return resultat;
     }
 
-    public void sauvegarderInstruments(List<Instrument> liste) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(cheminFichier))) {
-            for (Instrument i : liste) {
-                pw.println(construireLigneCSV(i));
-            }
-        } catch (IOException e) {
-            System.out.println("Erreur d'écriture : " + e.getMessage());
-        }
+    private Object convertir(String valeur, Class<?> type) {
+        if (type == int.class) return Integer.parseInt(valeur);
+        if (type == double.class) return Double.parseDouble(valeur);
+        return valeur;
     }
 
-    private Instrument creerInstance(String type, String[] data) {
+    private int extraireId(Object obj) {
         try {
-            Class<?> clazz = Class.forName(type);
-
-            if (type.equals("GuitareElectrique")) {
-                return (Instrument) clazz.getConstructor(int.class, String.class, String.class, double.class, int.class)
-                        .newInstance(Integer.parseInt(data[1]), data[2], data[3], Double.parseDouble(data[4]), Integer.parseInt(data[5]));
-            } else if (type.equals("Triangle")) {
-                return (Instrument) clazz.getConstructor(int.class, String.class, String.class, double.class)
-                        .newInstance(Integer.parseInt(data[1]), data[2], data[3], Double.parseDouble(data[4]));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String construireLigneCSV(Instrument i) {
-        String ligne = i.getClass().getSimpleName() + ";" + i.id + ";" + i.nom + ";" + i.marque + ";" + i.prix;
-
-        if (i instanceof Corde) ligne += ";" + ((Corde)i).getNbCordes();
-        else if (i instanceof Saxophone) ligne += ";" + ((Saxophone)i).getType();
-
-        return ligne;
+            // Cherche le champ "id" dans Instrument
+            Field f = obj.getClass().getSuperclass().getSuperclass().getDeclaredField("id");
+            f.setAccessible(true);
+            return (int) f.get(obj);
+        } catch (Exception e) { return 0; }
     }
 }

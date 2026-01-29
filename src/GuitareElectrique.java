@@ -1,6 +1,6 @@
 public class GuitareElectrique extends Corde implements Electrique {
 
-    private boolean estBranchee = false;
+    @CsvCol(index = 6) private boolean estBranchee = false;
 
     public GuitareElectrique(int id, String nom, String marque, double prix, int nbCordes) {
         super(id, nom, marque, prix, nbCordes);
