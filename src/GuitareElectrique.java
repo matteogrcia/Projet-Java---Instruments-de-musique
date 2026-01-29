@@ -1,9 +1,12 @@
 public class GuitareElectrique extends Corde implements Electrique {
 
-    @CsvCol(index = 6) private boolean estBranchee = false;
+    @CsvCol(index = 7) private boolean estBranchee = false;
 
     public GuitareElectrique(int id, String nom, String marque, double prix, int nbCordes) {
         super(id, nom, marque, prix, nbCordes);
+    }
+    public GuitareElectrique() {
+        super(0, "Inconnu", "Inconnue", 0.0, 0);
     }
 
     @Override

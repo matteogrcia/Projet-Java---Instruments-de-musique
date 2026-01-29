@@ -1,6 +1,6 @@
 public abstract class Corde extends Instrument {
 
-    @CsvCol(index = 5) protected int nbCordes;
+    @CsvCol(index = 6) protected int nbCordes;
 
     public Corde(int id, String nom, String marque, double prix, int nbCordes) {
         super(id, nom, marque, prix);
