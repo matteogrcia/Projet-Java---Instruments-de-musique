@@ -19,4 +19,10 @@ public abstract class Instrument {
 
     public String getNom() { return nom; }
     public double getPrix() { return prix; }
+    public int getId() {
+        return id;
+    }
+    public String getMarque() {
+        return marque;
+    }
 }
