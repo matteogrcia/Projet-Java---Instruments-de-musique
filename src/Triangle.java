@@ -3,6 +3,9 @@ public class Triangle extends Percussion {
     public Triangle(int id, String nom, String marque, double prix) {
         super(id, nom, marque, prix, false);
     }
+    public Triangle() {
+        super(0, "Inconnu", "Inconnue", 0.0, false);
+    }
 
     @Override
     public void jouer() {
