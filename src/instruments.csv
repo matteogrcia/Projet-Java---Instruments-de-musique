@@ -19,7 +19,6 @@ GuitareAcoustique;17;Big Baby;Taylor;550.0;6
 GuitareAcoustique;18;F-250;Guild;650.0;6
 GuitareAcoustique;19;Parlor;Gretsch;350.0;6
 GuitareAcoustique;20;Texan;Epiphone;800.0;6
-GuitareAcoustique;56;L-00;Gibson;1900.0;6
 Piano;39;U1;Yamaha;8500.0;0
 Piano;40;B1;Yamaha;3800.0;0
 Piano;41;Model D;Steinway;150000.0;0
@@ -39,6 +38,7 @@ Flute;28;Traverso;Mollenhauer;450.0;Bois
 Flute;29;Alto Flute;Jupiter;1450.0;Argent
 Flute;30;Irish Flute;Waltons;60.0;Bois
 Flute;57;Quena;Andes Music;85.0;Bois
+Flute;61;FLUTEUH;TAMERE;0.5;Inconnue
 Clarinette;49;E13;Buffet Crampon;1200.0;Bois
 Clarinette;50;YCL-255;Yamaha;550.0;ABS
 Saxophone;51;YAS-280;Yamaha;980.0;Laiton;
@@ -58,4 +58,4 @@ Tambour;47;Caisse Claire;Sonor;250.0;true
 Tambour;48;Congas;LP;550.0;true
 Triangle;53;Triangle Pro;Grover;45.0;true
 Triangle;54;Triangle d'Orchestre;Stagg;15.0;true
-Flute;61;FLUTEUH;TAMERE;0.5;Inconnue
+GuitareAcoustique;62;ELFIBAE;EFAAZE;5.0;0

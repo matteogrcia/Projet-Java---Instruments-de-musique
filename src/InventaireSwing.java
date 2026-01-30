@@ -19,12 +19,14 @@ public class InventaireSwing extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
+        // Chargement initial des données
         monInventaire.chargerDepuisCSV(gestionnaire, CSV_PATH, new Class[]{
                 GuitareElectrique.class, GuitareAcoustique.class, Piano.class, Clavier.class,
                 Flute.class, Clarinette.class, Saxophone.class,
                 Batterie.class, Tambour.class, Triangle.class
         });
 
+        // --- HAUT : GRANDES CATÉGORIES ---
         JPanel panelCategories = new JPanel(new FlowLayout());
         JButton btnCordes = new JButton("Cordes / Claviers");
         JButton btnVents = new JButton("Vents");
@@ -35,12 +37,14 @@ public class InventaireSwing extends JFrame {
         panelCategories.add(btnPercussions);
         add(panelCategories, BorderLayout.NORTH);
 
+        // --- GAUCHE : SOUS-CATÉGORIES ---
         panelSousCategories = new JPanel();
         panelSousCategories.setLayout(new BoxLayout(panelSousCategories, BoxLayout.Y_AXIS));
         panelSousCategories.setPreferredSize(new Dimension(200, 0));
         panelSousCategories.setBorder(BorderFactory.createTitledBorder("Instruments"));
         add(panelSousCategories, BorderLayout.WEST);
 
+        // --- CENTRE : TABLEAU ---
         String[] colonnes = {"ID", "Nom", "Marque", "Prix"};
         model = new DefaultTableModel(colonnes, 0) {
             @Override
@@ -49,15 +53,17 @@ public class InventaireSwing extends JFrame {
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
+        // --- BAS : ACTIONS ---
         JPanel panelActions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnAjouter = new JButton("Ajouter");
         JButton btnSupprimer = new JButton("Supprimer");
-        btnSupprimer.setBackground(new Color(255, 102, 102));
+        btnSupprimer.setBackground(new Color(255, 102, 102)); // On garde juste le rouge pour la sécurité
 
         panelActions.add(btnAjouter);
         panelActions.add(btnSupprimer);
         add(panelActions, BorderLayout.SOUTH);
 
+        // --- LOGIQUE DES BOUTONS ---
         btnCordes.addActionListener(e -> afficherSousCategories("Cordes"));
         btnVents.addActionListener(e -> afficherSousCategories("Vents"));
         btnPercussions.addActionListener(e -> afficherSousCategories("Percussions"));
@@ -66,9 +72,67 @@ public class InventaireSwing extends JFrame {
         btnAjouter.addActionListener(e -> actionAjouter());
     }
 
+    private void actionSupprimer() {
+        int row = table.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Sélectionnez un instrument.");
+            return;
+        }
+
+        int id = (int) table.getValueAt(row, 0);
+        String nom = (String) table.getValueAt(row, 1);
+
+        // CONFIRMATION SUPPRESSION
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Supprimer l'instrument : " + nom + " (ID: " + id + ") ?",
+                "Confirmation", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                monInventaire.supprimer(id);
+                rafraichirTableau(classeActuelle);
+            } catch (InstrumentNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
+        }
+    }
+
+    private void actionAjouter() {
+        if (classeActuelle == null) {
+            JOptionPane.showMessageDialog(this, "Sélectionnez d'abord une catégorie à gauche.");
+            return;
+        }
+
+        JTextField nomF = new JTextField();
+        JTextField marqueF = new JTextField();
+        JTextField prixF = new JTextField();
+
+        Object[] message = {"Nom:", nomF, "Marque:", marqueF, "Prix:", prixF};
+
+        int option = JOptionPane.showConfirmDialog(null, message, "Nouvel instrument (" + classeActuelle.getSimpleName() + ")", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            // CONFIRMATION AJOUT
+            int confirm = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment ajouter cet instrument ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    Instrument n = classeActuelle.getDeclaredConstructor().newInstance();
+                    n.setNom(nomF.getText());
+                    n.setMarque(marqueF.getText());
+                    n.setPrix(Double.parseDouble(prixF.getText()));
+
+                    monInventaire.ajouterEtSauvegarder(n, gestionnaire, CSV_PATH);
+                    rafraichirTableau(classeActuelle);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Erreur : " + ex.getMessage());
+                }
+            }
+        }
+    }
+
     private void afficherSousCategories(String categorie) {
         panelSousCategories.removeAll();
-
         switch (categorie) {
             case "Cordes":
                 ajouterBoutonType("Guitare Acoustique", GuitareAcoustique.class);
@@ -87,7 +151,6 @@ public class InventaireSwing extends JFrame {
                 ajouterBoutonType("Triangle", Triangle.class);
                 break;
         }
-
         panelSousCategories.revalidate();
         panelSousCategories.repaint();
     }
@@ -115,65 +178,6 @@ public class InventaireSwing extends JFrame {
                 model.addRow(ligne);
             }
         }
-    }
-
-    private void actionSupprimer() {
-        int row = table.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Sélectionnez un instrument.");
-            return;
-        }
-        int id = (int) table.getValueAt(row, 0);
-        try {
-            monInventaire.supprimer(id);
-            rafraichirTableau(classeActuelle);
-        } catch (InstrumentNotFoundException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
-        }
-    }
-
-    private void actionAjouter() {
-        if (classeActuelle == null) {
-            JOptionPane.showMessageDialog(this, "Sélectionnez d'abord une catégorie.");
-            return;
-        }
-
-        JTextField nomF = new JTextField();
-        JTextField marqueF = new JTextField();
-        JTextField prixF = new JTextField();
-
-        Object[] message = {"Nom:", nomF, "Marque:", marqueF, "Prix:", prixF};
-
-        int option = JOptionPane.showConfirmDialog(null, message, "Ajouter " + classeActuelle.getSimpleName(), JOptionPane.OK_CANCEL_OPTION);
-
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                Instrument n = classeActuelle.getDeclaredConstructor().newInstance();
-
-                n.setNom(nomF.getText());
-                n.setMarque(marqueF.getText());
-                n.setPrix(Double.parseDouble(prixF.getText()));
-
-                monInventaire.ajouterEtSauvegarder(n, gestionnaire, CSV_PATH);
-
-                rafraichirTableau(classeActuelle);
-
-                JOptionPane.showMessageDialog(this, "Instrument ajouté avec succès !");
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Le prix doit être un nombre valide.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout : " + ex.getMessage());
-            }
-        }
-    }
-
-    private void setChamp(Object obj, String nomChamp, Object valeur) {
-        try {
-            java.lang.reflect.Field f = Instrument.class.getDeclaredField(nomChamp);
-            f.setAccessible(true);
-            f.set(obj, valeur);
-        } catch (Exception e) { e.printStackTrace(); }
     }
 
     public static void main(String[] args) {
