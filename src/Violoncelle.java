@@ -11,7 +11,7 @@ public class Violoncelle extends Corde{
 
     @Override
     public void jouer() {
-        System.out.println("Le saxophone " /*+ type + " "*/ + nom + " joue une mélodie douce forte.");
+        System.out.println("Le violoncelle " /*+ type + " "*/ + nom + " joue une mélodie douce.");
     }
 
     /*public String getType() {

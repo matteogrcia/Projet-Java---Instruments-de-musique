@@ -1,3 +1,60 @@
-GuitareElectrique;1;Stratocaster;Fender;1200.0;6
-Saxophone;2;Yas-280;Yamaha;950.0;2
+GuitareElectrique;1;Stratocaster;Fender;1200.0;6;true
+Saxophone;2;Yas-280;Yamaha;950.0;Cuivre;Alto
 Triangle;3;Percu-Pro;Pearl;25.0;false
+Clarinette;4;E13;Buffet Crampon;2100.0;Ébène
+Flute;5;YFL-212;Yamaha;580.0;Argent
+GuitareAcoustique;6;D-28;Martin;3500.0;6
+Piano;7;B1;Yamaha;4500.0;88
+Tambour;8;Snare Drum;Ludwig;400.0;true
+Violoncelle;9;Student II;Stentor;850.0;4
+Clavier;10;MODX8;Yamaha;1600.0;88;true
+GuitareElectrique;11;Les Paul;Gibson;2400.0;6;false
+Saxophone;12;YTS-480;Yamaha;1800.0;Laiton;Tenor
+Clarinette;13;CL650;Conn-Selmer;450.0;ABS
+Flute;14;Flûte de Pan;Artisan;120.0;Bambou
+Tambour;15;Djembe;Toca;180.0;true
+Piano;16;P-125;Yamaha;650.0;88
+GuitareAcoustique;17;Baby Taylor;Taylor;490.0;6
+GuitareElectrique;18;Telecaster;Fender;1100.0;6;true
+Triangle;19;Standard;Meinl;15.0;false
+Violoncelle;20;Master;Yamaha;3200.0;4
+GuitareElectrique;21;Ibanez RG;Ibanez;899.0;6;true
+Saxophone;22;Custom EX;Yamaha;4200.0;Or;Soprano
+Triangle;23;Pro Studio;Stagg;12.50;false
+Clarinette;24;RC Prestige;Buffet Crampon;3800.0;Grenadille
+Flute;25;YFL-472;Yamaha;1350.0;Argent Massif
+GuitareAcoustique;26;Hummingbird;Gibson;3900.0;6
+Piano;27;K-300;Kawai;6200.0;88
+Tambour;28;Caisse Claire;Gretsch;350.0;true
+Violoncelle;29;Virtuoso;Gewo;1200.0;4
+Clavier;30;Nord Stage 3;Nord;3200.0;88;true
+GuitareElectrique;31;Silver Sky;PRS;2600.0;6;true
+Saxophone;32;Super Action 80;Selmer;5500.0;Laiton;Baryton
+Clarinette;33;B12;Buffet Crampon;350.0;Résine
+Flute;34;Native;Artisan;220.0;Cèdre
+Tambour;35;Conga;LP;450.0;true
+Piano;36;Model B;Steinway;95000.0;88
+GuitareAcoustique;37;000-15M;Martin;1650.0;6
+GuitareElectrique;38;Pacific 112;Yamaha;280.0;6;false
+Triangle;39;Trigon;Meinl;45.0;false
+Violoncelle;40;Montagnana;Handmade;15000.0;4
+Clavier;41;Kross 2;Korg;750.0;61;true
+Saxophone;42;Alto Reference;Selmer;6100.0;Bronze;Alto
+Clarinette;43;E11;Buffet Crampon;1100.0;Bois
+GuitareElectrique;44;JS32;Jackson;320.0;6;true
+GuitareAcoustique;45;Big Baby;Taylor;550.0;6
+Tambour;46;Timbales;LP;580.0;false
+Piano;47;N1X;Yamaha;8200.0;88
+Flute;48;Student;Pearl;650.0;Nickel
+Violoncelle;49;Conservatoire;Stentor;600.0;4
+Clavier;50;Fantom 8;Roland;3800.0;88;true
+GuitareElectrique;51;Mustang;Fender;600.0;6;false
+Saxophone;52;Jupiter JTS;Jupiter;1100.0;Laiton;Tenor
+Clarinette;53;Student;Jupiter;420.0;ABS
+Flute;54;Flûte à bec;Aulos;35.0;Plastique
+Tambour;55;Bongo;Meinl;110.0;true
+Piano;56;Upright;U3;Yamaha;12000.0;88
+GuitareAcoustique;57;J-45;Gibson;2800.0;6
+GuitareElectrique;58;S-G;Epiphone;450.0;6;true
+Triangle;59;Kids;Fuzeau;8.0;false
+Violoncelle;60;Cello Pro;Eastman;2400.0;4
