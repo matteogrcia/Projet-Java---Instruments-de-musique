@@ -1,8 +1,8 @@
-public class PianoClavier extends Corde{
+public class PianoClavier extends Corde implements Electrique{
 
 
-        @CsvCol(index = 8)
-        private String type; // numérique, hybride
+    private String type; // numérique, hybride
+    private boolean estBranchee = false;
 
         public PianoClavier(int id, String nom, String marque, double prix,
                             int nbCordes,  String type) {
@@ -17,11 +17,28 @@ public class PianoClavier extends Corde{
 
         @Override
         public void jouer() {
-            System.out.println("Le piano clavier " + type + " " + nom + " joue avec amplification.");
+            if (estBranchee){
+                System.out.println("Le piano clavier " + type + " " + nom + " joue avec amplification.");
+            }
+            else{
+                System.out.println("Le piano clavier ne sors pas de ") ;
+            }
+
         }
 
         public String getType() {
             return type;
         }
+    @Override
+    public void brancher() {
+        this.estBranchee = true;
+        System.out.println("Câble jack inséré. Guitare branchée.");
     }
+
+    @Override
+    public void reglerVolume(int niveau) {
+        System.out.println("Volume de la guitare réglé sur " + niveau + "/10.");
+    }
+    }
+
 
