@@ -6,51 +6,87 @@ public class GestionnaireCSV {
 
     public <T> List<T> chargerDonnees(String chemin, Class<T> classeCible) throws Exception {
         List<T> resultat = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new FileReader(chemin));
-        String ligne;
+        try (BufferedReader br = new BufferedReader(new FileReader(chemin))) {
+            String ligne;
+            while ((ligne = br.readLine()) != null) {
+                String[] colonnes = ligne.split(";");
 
-        while ((ligne = br.readLine()) != null) {
-            String[] colonnes = ligne.split(";");
+                if (colonnes.length == 0 || !colonnes[0].equalsIgnoreCase(classeCible.getSimpleName())) {
+                    continue;
+                }
 
-            // FILTRE : On vérifie si la ligne commence par le nom de la classe (ex: "GuitareElectrique")
-            if (colonnes.length == 0 || !colonnes[0].equalsIgnoreCase(classeCible.getSimpleName())) {
-                continue;
-            }
+                T objet = classeCible.getDeclaredConstructor().newInstance();
 
-            // Création de l'objet (nécessite un constructeur vide dans vos classes)
-            T objet = classeCible.getDeclaredConstructor().newInstance();
+                Class<?> actuelle = classeCible;
+                while (actuelle != null) {
+                    for (Field champ : actuelle.getDeclaredFields()) {
+                        if (champ.isAnnotationPresent(CsvCol.class)) {
+                            CsvCol annotation = champ.getAnnotation(CsvCol.class);
+                            int index = annotation.index(); // 1-based index
+                            index--; // on convertit en 0-based
 
-            // Remplissage des champs via Réflexion
-            Class<?> actuelle = classeCible;
-            while (actuelle != null) {
-                for (Field champ : actuelle.getDeclaredFields()) {
-                    if (champ.isAnnotationPresent(CsvCol.class)) {
-                        CsvCol annotation = champ.getAnnotation(CsvCol.class);
-                        int index = annotation.index() - 1; // On ajuste l'index (0, 1, 2...)
-
-                        if (index < colonnes.length) {
-                            champ.setAccessible(true);
-                            Object valeurConvertie = convertir(colonnes[index], champ.getType());
-                            champ.set(objet, valeurConvertie);
+                            if (index < colonnes.length) {
+                                champ.setAccessible(true);
+                                Object valeurConvertie = convertir(colonnes[index], champ.getType());
+                                champ.set(objet, valeurConvertie);
+                            }
                         }
                     }
+                    actuelle = actuelle.getSuperclass();
                 }
-                actuelle = actuelle.getSuperclass(); // On remonte vers Instrument
-            }
-            resultat.add(objet);
-        }
-        br.close();
 
-        // Application du tri persistant par ID comme demandé
+                resultat.add(objet);
+            }
+        }
+
         resultat.sort(Comparator.comparingInt(this::extraireId));
 
         return resultat;
     }
 
+    public <T> void sauvegarderDonnees(String chemin, List<T> objets)
+            throws IOException, IllegalAccessException {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(chemin))) {
+
+            for (T obj : objets) {
+                Class<?> classeActuelle = obj.getClass();
+                Map<Integer, String> colonnes = new TreeMap<>();
+
+                while (classeActuelle != null) {
+                    for (Field champ : classeActuelle.getDeclaredFields()) {
+                        if (champ.isAnnotationPresent(CsvCol.class)) {
+                            CsvCol annotation = champ.getAnnotation(CsvCol.class);
+                            champ.setAccessible(true);
+                            Object valeur = champ.get(obj);
+                            colonnes.put(annotation.index(),
+                                    valeur == null ? "" : valeur.toString());
+                        }
+                    }
+                    classeActuelle = classeActuelle.getSuperclass();
+                }
+
+                StringBuilder ligne = new StringBuilder();
+
+                // Nom de la classe
+                ligne.append(obj.getClass().getSimpleName());
+
+                // Colonnes triées automatiquement (TreeMap)
+                for (String valeur : colonnes.values()) {
+                    ligne.append(";").append(valeur);
+                }
+
+                bw.write(ligne.toString());
+                bw.newLine();
+            }
+        }
+    }
+
+
     private Object convertir(String valeur, Class<?> type) {
         if (valeur == null || valeur.trim().isEmpty()) return null;
         try {
-            if (type == int.class || type == Integer.class) return (int) Double.parseDouble(valeur);
+            if (type == int.class || type == Integer.class) return Integer.parseInt(valeur);
             if (type == double.class || type == Double.class) return Double.parseDouble(valeur);
             if (type == boolean.class || type == Boolean.class) return Boolean.parseBoolean(valeur);
         } catch (Exception e) {

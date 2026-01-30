@@ -12,17 +12,21 @@ public class Inventaire<T extends Instrument> {
         this.stock = new ArrayList<>();
     }
 
-    public boolean existe(int id) {
-        return stock.stream().anyMatch(i -> i.getId() == id);
+    private int genererProchainId() {
+        return stock.stream()
+                .mapToInt(Instrument::getId)
+                .max()
+                .orElse(0) + 1;
     }
 
-    public void ajouter(T instrument) {
-        if (existe(instrument.getId())) {
-            throw new IllegalArgumentException(
-                    "Un instrument avec l'ID" + instrument.getId() + "existe déjà."
-            );
-        }
+    public void ajouterEtSauvegarder(T instrument, GestionnaireCSV g, String fichier) throws Exception {
+        int nouvelId = genererProchainId();
+        instrument.setId(nouvelId);
+
         stock.add(instrument);
+
+        g.sauvegarderDonnees(fichier, stock);
+        System.out.println("Instrument ajouté et fichier mis à jour !");
     }
 
     public void supprimer(int id) throws InstrumentNotFoundException {
@@ -62,11 +66,19 @@ public class Inventaire<T extends Instrument> {
                 .collect(Collectors.toList());
     }
 
-    public boolean estVide() {
-        return stock.isEmpty();
-    }
-
     public List<T> getStock() {
         return stock;
+    }
+
+    public void chargerDepuisCSV(GestionnaireCSV gestionnaire, String fichier, Class<? extends T>[] classes) {
+        try {
+            for (Class<? extends T> classe : classes) {
+                List<? extends T> items = gestionnaire.chargerDonnees(fichier, classe);
+                this.stock.addAll(items);
+            }
+            System.out.println(stock.size() + " instruments chargés avec succès.");
+        } catch (Exception e) {
+            System.err.println("Erreur de chargement : " + e.getMessage());
+        }
     }
 }
