@@ -25,6 +25,9 @@ public abstract class Instrument {
     public void setId(int id) {
         this.id = id;
     }
+    public void setNom(String nom) { this.nom = nom; }
+    public void setMarque(String marque) { this.marque = marque; }
+    public void setPrix(double prix) { this.prix = prix; }
     public String getMarque() {
         return marque;
     }
