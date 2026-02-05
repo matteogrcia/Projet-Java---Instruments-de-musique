@@ -19,6 +19,7 @@ GuitareAcoustique;17;Big Baby;Taylor;550.0;6
 GuitareAcoustique;18;F-250;Guild;650.0;6
 GuitareAcoustique;19;Parlor;Gretsch;350.0;6
 GuitareAcoustique;20;Texan;Epiphone;800.0;6
+GuitareAcoustique;62;ELFIBAE;EFAAZE;5.0;0
 Piano;39;U1;Yamaha;8500.0;0
 Piano;40;B1;Yamaha;3800.0;0
 Piano;41;Model D;Steinway;150000.0;0
@@ -58,4 +59,3 @@ Tambour;47;Caisse Claire;Sonor;250.0;true
 Tambour;48;Congas;LP;550.0;true
 Triangle;53;Triangle Pro;Grover;45.0;true
 Triangle;54;Triangle d'Orchestre;Stagg;15.0;true
-GuitareAcoustique;62;ELFIBAE;EFAAZE;5.0;0

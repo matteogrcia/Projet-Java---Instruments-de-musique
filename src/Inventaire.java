@@ -1,15 +1,31 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.logging.*;
+import java.io.IOException;
 
 public class Inventaire<T extends Instrument> {
 
     private List<T> stock;
+    // Définition du logger
+    private static final Logger logger = Logger.getLogger(Inventaire.class.getName());
 
     public Inventaire() {
         this.stock = new ArrayList<>();
+        configurerLogger();
+    }
+
+    private void configurerLogger() {
+        try {
+            // Création d'un gestionnaire de fichier (append = true pour ne pas effacer les anciens logs)
+            FileHandler fh = new FileHandler("inventaire.log", true);
+            fh.setFormatter(new SimpleFormatter()); // Format texte lisible
+            logger.addHandler(fh);
+
+            // On peut aussi définir le niveau de précision
+            logger.setLevel(Level.ALL);
+        } catch (IOException e) {
+            System.err.println("Impossible d'initialiser le fichier de log : " + e.getMessage());
+        }
     }
 
     private int genererProchainId() {
@@ -24,30 +40,22 @@ public class Inventaire<T extends Instrument> {
         instrument.setId(nouvelId);
 
         stock.add(instrument);
-
         g.sauvegarderDonnees(fichier, stock);
-        System.out.println("Instrument ajouté et fichier mis à jour !");
+
+        // Log d'information
+        logger.info("Nouvel instrument ajouté : ID " + nouvelId + " (" + instrument.getClass().getSimpleName() + ")");
     }
 
-    public void supprimer(int id) throws InstrumentNotFoundException {
-        T instr = trouverParId(id);
-        stock.remove(instr);
-    }
-
-    public void trierParPrix() {
-        stock.sort(Comparator.comparingDouble(Instrument::getPrix));
-        System.out.println("Inventaire trié par prix.");
-    }
-
-    public void trierParNom() {
-        stock.sort(Comparator.comparing(Instrument::getNom));
-        System.out.println("Inventaire trié par nom.");
-    }
-
-    public void afficherInventaire() {
-        System.out.println("État de l'Inventaire ");
-        for (T instrument : stock) {
-            instrument.afficherInfos();
+    public void supprimer(int id, GestionnaireCSV g, String fichier) throws Exception {
+        try {
+            T instr = trouverParId(id);
+            stock.remove(instr);
+            g.sauvegarderDonnees(fichier, stock);
+            logger.info("Instrument avec ID " + id + " supprimé avec succès.");
+        } catch (InstrumentNotFoundException e) {
+            // Log d'avertissement
+            logger.warning("Tentative de suppression échouée : " + e.getMessage());
+            throw e;
         }
     }
 
@@ -55,19 +63,11 @@ public class Inventaire<T extends Instrument> {
         return stock.stream()
                 .filter(i -> i.getId() == id)
                 .findFirst()
-                .orElseThrow(() ->
-                        new InstrumentNotFoundException("Instrument avec ID " + id + " introuvable."));
-    }
-
-    public List<T> rechercher(String motCle) {
-        return stock.stream()
-                .filter(i -> i.getNom().toLowerCase().contains(motCle.toLowerCase())
-                        || i.getMarque().toLowerCase().contains(motCle.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    public List<T> getStock() {
-        return stock;
+                .orElseThrow(() -> {
+                    String msg = "Instrument avec ID " + id + " introuvable.";
+                    logger.fine(msg); // Log de niveau bas (debug)
+                    return new InstrumentNotFoundException(msg);
+                });
     }
 
     public void chargerDepuisCSV(GestionnaireCSV gestionnaire, String fichier, Class<? extends T>[] classes) {
@@ -76,9 +76,14 @@ public class Inventaire<T extends Instrument> {
                 List<? extends T> items = gestionnaire.chargerDonnees(fichier, classe);
                 this.stock.addAll(items);
             }
-            System.out.println(stock.size() + " instruments chargés avec succès.");
+            logger.info(stock.size() + " instruments chargés depuis le fichier " + fichier);
         } catch (Exception e) {
-            System.err.println("Erreur de chargement : " + e.getMessage());
+            // Log d'erreur sévère
+            logger.severe("Erreur critique lors du chargement CSV : " + e.getMessage());
         }
+    }
+
+    public List<T> getStock() {
+        return stock;
     }
 }

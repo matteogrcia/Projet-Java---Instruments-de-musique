@@ -75,24 +75,33 @@ public class InventaireSwing extends JFrame {
     private void actionSupprimer() {
         int row = table.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Sélectionnez un instrument.");
+            JOptionPane.showMessageDialog(this, "Sélectionnez un instrument dans le tableau.");
             return;
         }
 
+        // Récupération de l'ID (colonne 0) et du nom pour l'affichage
         int id = (int) table.getValueAt(row, 0);
         String nom = (String) table.getValueAt(row, 1);
 
-        // CONFIRMATION SUPPRESSION
+        // 1. CONFIRMATION SUPPRESSION
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Supprimer l'instrument : " + nom + " (ID: " + id + ") ?",
-                "Confirmation", JOptionPane.YES_NO_OPTION);
+                "Voulez-vous vraiment supprimer l'instrument : " + nom + " (ID: " + id + ") ?",
+                "Confirmation de suppression",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                monInventaire.supprimer(id);
+                // 2. APPEL DE LA LOGIQUE MÉTIER
+                monInventaire.supprimer(id, gestionnaire, CSV_PATH);
+
+                // 3. MISE À JOUR DE L'INTERFACE
                 rafraichirTableau(classeActuelle);
-            } catch (InstrumentNotFoundException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
+
+                JOptionPane.showMessageDialog(this, "Instrument supprimé et fichier mis à jour !");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression : " + ex.getMessage());
+                ex.printStackTrace(); // Utile pour le débuggage en console
             }
         }
     }
